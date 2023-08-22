@@ -8,11 +8,13 @@ Project Next Step/Difficulty:
 1.  De-Localize process, once it is safe to modify files beyond reading on CAS Drives - 1/10
 2.  Make program usable with any job stlye - multi line/jobs with S-units - 4/10
 3.  Make Program recognize VFD Parrameter style - EFI, RPC, 4-20mA, Potentiometer, Rotary Switch 3/10
-4.  Fill in correct sheet with needed information for different VFD PArameter Styles - 7/10
+4.  Fill in correct sheet with needed information for different VFD Parameter Styles - 7/10
 5.  De-Localize any variables that are a constant with every Parameter - 5/10
 6.  Add Error catching for human entry, including and not limited to: - 10/10
     characters enter into field
     files not found
     information not found on pdf
+    Possible converting null literal or possible null value to non-nullable type
+    failsafe workbook.Close() for program failure/crash
 
 Estimated Finish Time: 3 Weeks
