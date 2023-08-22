@@ -10,11 +10,11 @@ Project Next Step/Difficulty:
 3.  Make Program recognize VFD Parrameter style - EFI, RPC, 4-20mA, Potentiometer, Rotary Switch 3/10
 4.  Fill in correct sheet with needed information for different VFD Parameter Styles - 7/10
 5.  De-Localize any variables that are a constant with every Parameter - 5/10
-6.  Add Error catching for human entry, including and not limited to: - 10/10
-    characters enter into field
-    files not found
-    information not found on pdf
-    Possible converting null literal or possible null value to non-nullable type
-    failsafe workbook.Close() for program failure/crash
-
+6.  Add Error catching for human entry, including and not limited to: 10/10 <br>
+    /ncharacters enter into field<br>
+    files not found<br>
+    information not found on pdf<br>
+    Possible converting null literal or possible null value to non-nullable type<br>
+    failsafe workbook.Close() for program failure/crash<br>
+<br>
 Estimated Finish Time: 3 Weeks
