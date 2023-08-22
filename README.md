@@ -1,7 +1,7 @@
 # C#
 Program currently works on certain conditions on Kyle's local machine.  Conditions:
 1. Job is only for M-Units
-2. Job us for 0-10v DV Parameters
+2. Job is for 0-10v DC Parameters
 3. VFD Parameter sheets are in local drive at specified location
    
 Project Next Step/Difficulty:
@@ -14,3 +14,5 @@ Project Next Step/Difficulty:
     characters enter into field
     files not found
     information not found on pdf
+
+Estimated Finish Time: 3 Weeks
