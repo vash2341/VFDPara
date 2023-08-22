@@ -11,7 +11,7 @@ Project Next Step/Difficulty:
 4.  Fill in correct sheet with needed information for different VFD Parameter Styles - 7/10
 5.  De-Localize any variables that are a constant with every Parameter - 5/10
 6.  Add Error catching for human entry, including and not limited to: 10/10 <br>
-    /ncharacters enter into field<br>
+    characters enter into field<br>
     files not found<br>
     information not found on pdf<br>
     Possible converting null literal or possible null value to non-nullable type<br>
