@@ -6,9 +6,9 @@ Program currently works on certain conditions on local machine.  Conditions:
    
 Project Next Step/Difficulty:
 1.  De-Localize process, once it is safe to modify files beyond reading on CAS Drives - 1/10
-2.  Make program usable with any job stlye - multi line/jobs with S-units - 4/10
-3.  Make Program recognize VFD Parrameter style - EFI, RPC, 4-20mA, Potentiometer, Rotary Switch 3/10
-4.  Fill in correct sheet with needed information for different VFD Parameter Styles - 7/10
+2.  Make program usable with any job stlye - multi line/jobs with S-units - 10/10*
+3.  Make Program recognize VFD Parrameter style - EFI, RPC, 4-20mA, Potentiometer, Rotary Switch 3/10*
+4.  Fill in correct sheet with needed information for different VFD Parameter Styles - 7/10*
 5.  De-Localize any variables that are a constant with every Parameter - 5/10
 6.  Add Error catching for human entry, including and not limited to: 10/10 <br>
     characters enter into field<br>
@@ -18,3 +18,4 @@ Project Next Step/Difficulty:
     failsafe workbook.Close() for program failure/crash<br>
 <br>
 Estimated Finish Time: 3 Weeks
+* - Inprogress
