@@ -1,5 +1,5 @@
 # C#
-Program currently works on certain conditions on Kyle's local machine.  Conditions:
+Program currently works on certain conditions on local machine.  Conditions:
 1. Job is only for M-Units
 2. Job is for 0-10v DC Parameters
 3. VFD Parameter sheets are in local drive at specified location
