@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using IronPdf.Editing;
+using System.Runtime.InteropServices;
 
 namespace VFD_Parameters
 {
@@ -24,20 +25,14 @@ namespace VFD_Parameters
         {
                    
             IronPdf.License.LicenseKey = "IRONSUITE.KPFLUEGER.CAMBRIDGEAIR.COM.28633-7706A808A9-OADFF-NLHSTIBJBTZJ-KM24AWB4OZHP-WLU3JPANAJGB-VP5DRTLYA6I7-NR4WM7DGNY4R-CEHGKA777JB7-PCO7CD-TYWKV3K3GEOKUA-DEPLOYMENT.TRIAL-V4ZGAP.TRIAL.EXPIRES.14.SEP.2023";
-
-
-
-            //ApplicationConfiguration.Initialize();
-            //Application.Run(new Form1());
-
+                      
 
             //asking user to input SO# for finding SMART paperwork
             Console.WriteLine("Please enter SO#:");
             string SO = Console.ReadLine();
             string pdfFilePath = string.Empty;
             string numericalHP = string.Empty;
-            
-           
+                       
             DirectoryInfo hdDirectoryInWhichToSearch = new DirectoryInfo(@"R:\Quotes\Mseries\released\");
             FileInfo[] filesInDir = hdDirectoryInWhichToSearch.GetFiles("*" + SO + "*.*");
 
@@ -68,7 +63,7 @@ namespace VFD_Parameters
                    
                 
             }
-
+            
             //Console.WriteLine(mText);
 
             string blastDirection = mText.Substring(mText.LastIndexOf("BLAST") + 7, 9);
@@ -94,7 +89,7 @@ namespace VFD_Parameters
             string shopOrderNumber = mText.Substring(mText.IndexOf("Epicor") + 10, 6);
             string jobQuantity = mText.Substring(mText.IndexOf("QUANTITY:") + 10, 1);
             string horsePower = mText.Substring(mText.IndexOf("Motor -") + 7, 5);
-            string vfdRef = mText.Substring(mText.IndexOf("VFD REFERENCE:") + 15, 15);
+            string vfdRef = mText.Substring(mText.IndexOf("VFD REFERENCE:") + 15, 20);
 
             try
             {
@@ -248,7 +243,6 @@ namespace VFD_Parameters
             { FLA = "170"; }
 
             //console write lines to check what is being pulled
-            Console.WriteLine();
             Console.WriteLine("Model: " + modelSize);
             Console.WriteLine("Blast Direction: " + blastDirection);
             Console.WriteLine("Gas Type: " + gasType);
@@ -270,240 +264,341 @@ namespace VFD_Parameters
             Console.WriteLine("Reference: " + vfdRef);
 
             //open workbook for vfd paramters and write to excel workbook
-            var app = new Excel.Application();
+            var app = (new Excel.Application());
             Excel.Workbook workbook = null;
 
             workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\M Series VFD Worksheet Template MAIN.xlsm");
             Excel.Worksheet sheet = workbook.ActiveSheet;
             
-            sheet.Range["A2"].Value = modelSize.Trim();
-            sheet.Range["B2"].Value = gasType.ToString();
-            sheet.Range["A3"].Value = blastDirection.ToString();
-            sheet.Range["E1"].Value = jobName.ToString();
-            sheet.Range["E2"].Value = shopOrderNumber.ToString();
-            sheet.Range["E3"].Value = jobQuantity.ToString();
-            sheet.Range["E4"].Value = date.ToString();
-            sheet.Range["E5"].Value = createdBy.ToString();
-            sheet.Range["B8"].Value = numericalHP.ToString();
-            sheet.Range["D8"].Value = voltage.ToString();
-            sheet.Range["E8"].Value = phase.ToString();
-            sheet.Range["F8"].Value = FLA.ToString();
-            sheet.Range["G8"].Value = RPM.ToString();
-            sheet.Range["B11"].Value = CFM.ToString();
-            sheet.Range["F11"].Value = TESP.ToString();
-            sheet.Range["E25"].Value = manifoldPressureGEO.ToString();
-            sheet.Range["E26"].Value = manifoldPressureMAX.ToString();
+                sheet.Range["A2"].Value = modelSize.Trim();
+                sheet.Range["B2"].Value = gasType.ToString();
+                sheet.Range["A3"].Value = blastDirection.ToString();
+                sheet.Range["E1"].Value = jobName.ToString();
+                sheet.Range["E2"].Value = shopOrderNumber.ToString();
+                sheet.Range["E3"].Value = jobQuantity.ToString();
+                sheet.Range["E4"].Value = date.ToString();
+                sheet.Range["E5"].Value = createdBy.ToString();
+                sheet.Range["B8"].Value = numericalHP.ToString();
+                sheet.Range["D8"].Value = voltage.ToString();
+                sheet.Range["E8"].Value = phase.ToString();
+                sheet.Range["F8"].Value = FLA.ToString();
+                sheet.Range["G8"].Value = RPM.ToString();
+                sheet.Range["B11"].Value = CFM.ToString();
+                sheet.Range["F11"].Value = TESP.ToString();
+                sheet.Range["E25"].Value = manifoldPressureGEO.ToString();
+                sheet.Range["E26"].Value = manifoldPressureMAX.ToString();
 
+                double minFREQ = sheet.Range["E17"].Value;
+                double geoFREQ = sheet.Range["E16"].Value;
+                minFREQ = Math.Round(minFREQ, 1);
+                geoFREQ = Math.Round(geoFREQ, 1);
 
-            double minFREQ = sheet.Range["E17"].Value;
-            double geoFREQ = sheet.Range["E16"].Value;
-            minFREQ = Math.Round(minFREQ, 1);
-            geoFREQ = Math.Round(geoFREQ, 1);
+                workbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " Worksheet" + ".xlsm");
+                workbook.Close();
+                    
+            
 
-
-            workbook.Save();
-            workbook.Close();
-
+            //following blocks are for any VFD ref that needs additional information pulled (RS, EFI)
+            //code goes here stupid VVV         
             //picking VFD reference to open correct file and fill in correct cells
             if (vfdRef.Contains("DC"))
             {
-                //block for 0-10v DC
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                //block for 0-10v DC - DONE***********************
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E87"].Value = "60";
+                    sheetP.Range["E172"].Value = FLA.ToString();
+                    sheetP.Range["E173"].Value = voltage.ToString();
+                    sheetP.Range["E175"].Value = RPM.ToString();
+                    sheetP.Range["E176"].Value = numericalHP.ToString();
+                    sheetP.Range["E86"].Value = minFREQ;
+                    sheetP.Range["E135"].Value = minFREQ;
+                    sheetP.Range["E141"].Value = geoFREQ;
+                    sheetP.Range["E142"].Value = geoFREQ;
+                    sheetP.Range["f178"].Value = manifoldPressureGEO;
 
-            }
-            else if(vfdRef.Contains("RPC") && vfdRef.Contains("without")) 
-            {
-                //block for RPC with on off
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
-
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
-
-                workbook.Save();
-                workbook.Close();
+                    workbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " 0 -10VDC ACH580.xls");
+                    workbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
 
             }
-            else if (vfdRef.Contains("RPC") && vfdRef.Contains("with"))
+            else if(vfdRef.Contains("RPC") && vfdRef.Contains("out ")) 
             {
-                //block for RPC with on off
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                //block for RPC with on off - DONE***********************
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (RPC WITHOUT On-Off).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E170"].Value = FLA.ToString();
+                    sheetP.Range["E171"].Value = voltage.ToString();
+                    sheetP.Range["E173"].Value = RPM.ToString();
+                    sheetP.Range["E174"].Value = numericalHP.ToString();
+                    sheetP.Range["E133"].Value = minFREQ;                    
+                    sheetP.Range["E139"].Value = geoFREQ;
+                    sheetP.Range["E140"].Value = geoFREQ;
+                    sheetP.Range["F176"].Value = manifoldPressureGEO;
+
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " RPC without on-off ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
+
+            }
+            else if (vfdRef.Contains("RPC") && vfdRef.Contains(" with "))
+            {
+                //block for RPC with on off - DONE***********************
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
+
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (RPC WITH On-Off).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
+
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E170"].Value = FLA.ToString();
+                    sheetP.Range["E171"].Value = voltage.ToString();
+                    sheetP.Range["E173"].Value = RPM.ToString();
+                    sheetP.Range["E174"].Value = numericalHP.ToString();
+                    sheetP.Range["E133"].Value = minFREQ;
+                    sheetP.Range["E139"].Value = geoFREQ;
+                    sheetP.Range["E140"].Value = geoFREQ;
+                    sheetP.Range["F176"].Value = manifoldPressureGEO;
+
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " RPC with on-off ACH580.xls");
+                    Pworkbook.Close();                    
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
 
             }
             else if (vfdRef.Contains("EFI") && vfdRef.Contains("4"))
             {
                 //block for 4 EFI
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (4 EFIs).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E87"].Value = "60";
+                    sheetP.Range["E172"].Value = FLA.ToString();
+                    sheetP.Range["E173"].Value = voltage.ToString();
+                    sheetP.Range["E175"].Value = RPM.ToString();
+                    sheetP.Range["E176"].Value = numericalHP.ToString();
+                    sheetP.Range["E86"].Value = minFREQ;
+                    sheetP.Range["E135"].Value = minFREQ;
+                    sheetP.Range["E141"].Value = geoFREQ;
+                    sheetP.Range["E142"].Value = geoFREQ;
+                    sheetP.Range["f178"].Value = manifoldPressureGEO;
 
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " 4 EFI ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
             }
             else if (vfdRef.Contains("EFI") && vfdRef.Contains("3"))
             {
                 //block for 3 EFI
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (3 EFIs).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E87"].Value = "60";
+                    sheetP.Range["E172"].Value = FLA.ToString();
+                    sheetP.Range["E173"].Value = voltage.ToString();
+                    sheetP.Range["E175"].Value = RPM.ToString();
+                    sheetP.Range["E176"].Value = numericalHP.ToString();
+                    sheetP.Range["E86"].Value = minFREQ;
+                    sheetP.Range["E135"].Value = minFREQ;
+                    sheetP.Range["E141"].Value = geoFREQ;
+                    sheetP.Range["E142"].Value = geoFREQ;
+                    sheetP.Range["F178"].Value = manifoldPressureGEO;
+
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " 3 EFI ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
 
             }
             else if (vfdRef.Contains("Key"))
             {
-                //block for Keypad
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                //block for Keypad - DONE***********************
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (Keypad).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E169"].Value = FLA.ToString();
+                    sheetP.Range["E170"].Value = voltage.ToString();
+                    sheetP.Range["E172"].Value = RPM.ToString();
+                    sheetP.Range["E173"].Value = numericalHP.ToString();
+                    sheetP.Range["E133"].Value = minFREQ;
+                    sheetP.Range["E139"].Value = geoFREQ;
+                    sheetP.Range["E140"].Value = geoFREQ;
+                    sheetP.Range["F175"].Value = manifoldPressureGEO;
+
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " Keypad ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
 
             }
             else if (vfdRef.Contains("Poten"))
             {
-                //block for Potentiometer
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                //block for Potentiometer - DONE***********************
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (Potentiometer).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();                    
+                    sheetP.Range["E170"].Value = FLA.ToString();
+                    sheetP.Range["E171"].Value = voltage.ToString();
+                    sheetP.Range["E173"].Value = RPM.ToString();
+                    sheetP.Range["E174"].Value = numericalHP.ToString();                    
+                    sheetP.Range["E133"].Value = minFREQ;
+                    sheetP.Range["E139"].Value = geoFREQ;
+                    sheetP.Range["E140"].Value = geoFREQ;
+                    sheetP.Range["F176"].Value = manifoldPressureGEO;
 
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " Potentiometer ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheetP);
+                    workbook.Close();
+                    app.Quit();
+                }
             }
             else if (vfdRef.Contains("Rotary") && vfdRef.Contains("6"))
             {
-                //block for 2-4 RS
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                //block for 6 RS
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (Rotary Switch 6 Speeds).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E87"].Value = "60";
+                    sheetP.Range["E172"].Value = FLA.ToString();
+                    sheetP.Range["E173"].Value = voltage.ToString();
+                    sheetP.Range["E175"].Value = RPM.ToString();
+                    sheetP.Range["E176"].Value = numericalHP.ToString();
+                    sheetP.Range["E86"].Value = minFREQ;
+                    sheetP.Range["E135"].Value = minFREQ;
+                    sheetP.Range["E141"].Value = geoFREQ;
+                    sheetP.Range["E142"].Value = geoFREQ;
+                    sheetP.Range["f178"].Value = manifoldPressureGEO;
+
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " Rotary Switch 6 Speeds ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
 
             }
             else if (vfdRef.Contains("Rotary") && vfdRef.Contains("2"))
             {
-                //block for 6 RS
-                workbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (0-10VDC).xls");
-                Excel.Worksheet sheetP = workbook.ActiveSheet;
+                //block for 2-4 RS
+                var Papp = new Excel.Application();
+                Excel.Workbook Pworkbook = null;
 
-                sheetP.Range["A2"].Value = date.ToString();
-                sheetP.Range["E87"].Value = "60";
-                sheetP.Range["E172"].Value = FLA.ToString();
-                sheetP.Range["E173"].Value = voltage.ToString();
-                sheetP.Range["E175"].Value = RPM.ToString();
-                sheetP.Range["E176"].Value = numericalHP.ToString();
-                sheetP.Range["E86"].Value = minFREQ;
-                sheetP.Range["E135"].Value = minFREQ;
-                sheetP.Range["E141"].Value = geoFREQ;
-                sheetP.Range["E142"].Value = geoFREQ;
-                sheetP.Range["f178"].Value = manifoldPressureGEO;
+                Pworkbook = app.Workbooks.Open(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\ACH580 (Rotary Switch 2-4 Speeds).xls");
+                Excel.Worksheet sheetP = Pworkbook.ActiveSheet;
 
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+
+                    sheetP.Range["A2"].Value = date.ToString();
+                    sheetP.Range["E87"].Value = "60";
+                    sheetP.Range["E172"].Value = FLA.ToString();
+                    sheetP.Range["E173"].Value = voltage.ToString();
+                    sheetP.Range["E175"].Value = RPM.ToString();
+                    sheetP.Range["E176"].Value = numericalHP.ToString();
+                    sheetP.Range["E86"].Value = minFREQ;
+                    sheetP.Range["E135"].Value = minFREQ;
+                    sheetP.Range["E141"].Value = geoFREQ;
+                    sheetP.Range["E142"].Value = geoFREQ;
+                    sheetP.Range["f178"].Value = manifoldPressureGEO;
+
+                    Pworkbook.SaveAs(@"C:\Users\kpflueger\Desktop\Tech Stuff\VFDs\Templates\" + SO + " Rotary 2-4 Speed ACH580.xls");
+                    Pworkbook.Close();
+                }
+                catch
+                {
+                    Marshal.ReleaseComObject(sheet);
+                    workbook.Close();
+                    app.Quit();
+                }
 
             }
-            workbook.Close();
+                     
         }
 
 
